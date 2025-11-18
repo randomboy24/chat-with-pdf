@@ -1,0 +1,16 @@
+version: "3.9"
+
+services:
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: test
+      MONGO_INITDB_ROOT_PASSWORD: test
+    container_name: mongodb_chat-with-pdf
+
+volumes:
+  mongo-data:
