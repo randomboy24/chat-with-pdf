@@ -12,5 +12,23 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: test
     container_name: mongodb_chat-with-pdf
 
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    container_name: redis_chat-with-pdf
+    volumes:
+      - redis-data:/data
+
+  chromadb:
+    image: chromadb/chroma
+    ports:
+      - "8000:8000"
+    container_name: chromadb_chat-with-pdf
+    volumes:
+      - chromadb-data:/data
+
 volumes:
   mongo-data:
+  redis-data:
+  chromadb-data:

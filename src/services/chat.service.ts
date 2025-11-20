@@ -1,6 +1,9 @@
+import vectorStore from "../config/vectorStore.js";
 import Chat from "../models/Chat.model.js";
 import Message from "../models/Message.model.js";
 import { GoogleGenAI } from "@google/genai";
+import { generateAndStoreEmbeddings } from "./embeddings.service.js";
+import { ZodNullable } from "zod/v3";
 
 export const createChat = async (data: {
   userId: string;
@@ -39,10 +42,12 @@ export const sendMessage = async (data: {
   chatId: string;
 }) => {
   // Implementation for creating a message in a chat
+  console.log("sendMesssage service called");
   const chat = await Chat.findOne({
     _id: data.chatId,
   });
   if (!chat) {
+    console.log("chat not found");
     throw new Error("Chat not found");
   }
 
@@ -71,6 +76,32 @@ export const sendMessage = async (data: {
   const ai = new GoogleGenAI({
     apiKey: process.env.GEMINI_KEY!,
   });
+
+  // do an vector search to get relevant chunks from the documents in the chat
+
+  const collection = await vectorStore.getOrCreateCollection({
+    name: "test",
+    embeddingFunction: null,
+  });
+
+  const queryEmbeddings = await generateAndStoreEmbeddings({
+    type: "query",
+    chunk: data.content,
+  });
+  console.log("Query embeddings generated:", queryEmbeddings);
+  const results = await collection.query({
+    queryEmbeddings: [Array.from(queryEmbeddings)],
+    include: ["documents", "metadatas", "distances"],
+  });
+  console.log("Vector search results:", results.documents[0]);
+
+  const lastMessage = chatHistory[chatHistory.length - 1];
+  if (lastMessage && lastMessage.parts && lastMessage.parts[0]) {
+    lastMessage.parts[0].text = `Context from the data sources user has provided = \n\n${results.documents[0]}`;
+  } else {
+    // Handle the case where the message or parts is not available
+    console.error("Error: Message or parts are undefined");
+  }
 
   const aiResponse = await ai.models.generateContent({
     model: "gemini-2.5-flash",
