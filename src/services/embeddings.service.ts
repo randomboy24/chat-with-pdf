@@ -36,7 +36,7 @@ export const generateAndStoreEmbeddings = async (data: {
   });
 
   const result = await collection.add({
-    ids: [randomUUID()],
+    ids: [data.chunkId!],
     documents: [data.chunk!],
     embeddings: [embeddings as number[]],
   });

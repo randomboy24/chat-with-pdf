@@ -11,7 +11,14 @@ export const signUp = async (req: Request, res: Response) => {
 
   try {
     const token = await authService.signUp(parsed.data);
-    res.status(201).json({ token });
+    res.cookie("access_token", token, {
+      httpOnly: true,
+      expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+      sameSite: "lax",
+    });
+    res.status(201).json({
+      message: "Signup successfully",
+    });
   } catch (error: any) {
     if (
       error.message.includes("User already exists") ||
@@ -31,7 +38,14 @@ export const login = async (req: Request, res: Response) => {
   }
   try {
     const token = await authService.login(parsed.data);
-    res.status(200).json({ token });
+    res.cookie("access_token", token, {
+      httpOnly: true,
+      expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+      sameSite: "lax",
+    });
+    res.status(200).json({
+      message: "Login successfully",
+    });
   } catch (error: any) {
     if (error.message?.includes("User doesn't exists")) {
       return res.status(400).json({ message: error.message });
