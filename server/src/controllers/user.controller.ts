@@ -27,7 +27,7 @@ export const getUsers = async (req: Request, res: Response) => {
     console.log("Fetched users:", users);
     res.status(200).json(users);
   } catch (error) {
-    console.log("Error in getUsers:", error);
+    console.error("Error in getUsers:", error);
     res.status(500).json({ message: (error as Error).message });
   }
 };

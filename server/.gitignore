@@ -47,3 +47,4 @@ coverage/
 .npm/
 .eslintcache
 
+uploads/
