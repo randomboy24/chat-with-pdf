@@ -1,14 +1,23 @@
 import { Schema, model } from "mongoose";
 
 export interface IUser {
-  name: string;
-  password: string;
+  _id: string;
+  email: string;
+  first_name: string | null;
+  last_name: string | null;
+  username: string | null;
+  image_url: string | null;
 }
 
 const userSchema = new Schema<IUser>(
   {
-    name: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
+    _id: { type: String, required: true },
+    email : { type: String,required: true, unique: true, index: true },
+    first_name: { type: String, default: null },
+    last_name: { type: String, default: null },
+    username: { type: String, default: null },
+    image_url: { type: String, default: null },
+    
   },
   {
     timestamps: true,
